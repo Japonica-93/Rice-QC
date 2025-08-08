@@ -22,11 +22,22 @@ jobs:
           flutter-version: '3.22.0'
           channel: 'stable'
 
+      # Nếu bạn lỡ upload code trong thư mục rice_qc_skeleton/,
+      # bước này sẽ copy nó ra gốc repo trước khi build
+      - name: Bring skeleton to repo root (if needed)
+        run: |
+          if [ -d "rice_qc_skeleton" ]; then
+            cp -R rice_qc_skeleton/* .
+          fi
+
+      # Tạo phần Android nếu thiếu và ép tên project hợp lệ
       - name: Create missing Android project files
         run: |
           flutter --version
-          if [ ! -d "android" ] || [ ! -f "android/app/build.gradle" ]; then
-            flutter create . --platforms=android
+          if [ ! -f "pubspec.yaml" ]; then
+            flutter create . --platforms=android --project-name rice_qc --org com.company
+          elif [ ! -d "android" ] || [ ! -f "android/app/build.gradle" ]; then
+            flutter create . --platforms=android --project-name rice_qc
           fi
 
       - name: Flutter pub get
